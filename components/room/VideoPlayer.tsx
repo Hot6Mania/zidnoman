@@ -10,7 +10,7 @@ interface VideoPlayerProps {
 }
 
 export function VideoPlayer({ roomId }: VideoPlayerProps) {
-  const playerRef = useRef<ReactPlayer>(null)
+  const playerRef = useRef<any>(null)
   const { currentSong, playerState, updatePlayerState } = useRoomStore()
   const socket = getSocket()
 
@@ -87,9 +87,11 @@ export function VideoPlayer({ roomId }: VideoPlayerProps) {
     )
   }
 
+  const PlayerComponent = ReactPlayer as any
+
   return (
     <div className="w-full aspect-video bg-black rounded-lg overflow-hidden">
-      <ReactPlayer
+      <PlayerComponent
         ref={playerRef}
         url={song.url}
         playing={playerState.isPlaying}
