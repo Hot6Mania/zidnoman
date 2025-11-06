@@ -34,22 +34,22 @@
 
 ### 1. Clone the repository
 
-\`\`\`bash
+```bash
 git clone https://github.com/yourusername/zidnoman.git
 cd zidnoman
-\`\`\`
+```
 
 ### 2. Install dependencies
 
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 ### 3. Configure environment variables
 
-Create a \`.env.local\` file and add the following:
+Create a `.env.local` file and add the following:
 
-\`\`\`env
+```env
 # Vercel KV (Redis)
 KV_REST_API_URL=your_kv_url
 KV_REST_API_TOKEN=your_kv_token
@@ -73,7 +73,7 @@ YOUTUBE_REFRESH_TOKEN1=your_refresh_token_1
 
 # Cron Secret
 CRON_SECRET=your_random_secret_string
-\`\`\`
+```
 
 #### Setting up Vercel KV & Postgres
 
@@ -91,15 +91,15 @@ CRON_SECRET=your_random_secret_string
 
 ### 4. Initialize database
 
-\`\`\`bash
+```bash
 npx tsx .dev/scripts/init-db.ts
-\`\`\`
+```
 
 ### 5. Run development server
 
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
@@ -107,13 +107,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Deploying to Vercel (Recommended)
 
-\`\`\`bash
+```bash
 # Install Vercel CLI
 npm i -g vercel
 
 # Deploy
 vercel
-\`\`\`
+```
 
 Or use GitHub integration for automatic deployments:
 
@@ -124,7 +124,7 @@ Or use GitHub integration for automatic deployments:
 
 ## Project Structure
 
-\`\`\`
+```
 zidnoman/
 ├── app/                      # Next.js App Router
 │   ├── api/                  # API Routes
@@ -149,7 +149,7 @@ zidnoman/
 │   └── utils.ts             # Utility functions
 └── .dev/
     └── scripts/             # Build/deployment scripts
-\`\`\`
+```
 
 ## Usage
 
