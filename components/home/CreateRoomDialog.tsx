@@ -26,7 +26,6 @@ export function CreateRoomDialog() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  // 다이얼로그가 열릴 때마다 새로운 랜덤 값 생성
   useEffect(() => {
     if (open) {
       setRoomPlaceholder(generateRoomName())
@@ -35,7 +34,6 @@ export function CreateRoomDialog() {
   }, [open])
 
   const handleCreate = async () => {
-    // 빈 값이면 placeholder 사용
     const finalRoomName = roomName.trim() || roomPlaceholder
     const finalUsername = username.trim() || usernamePlaceholder
 

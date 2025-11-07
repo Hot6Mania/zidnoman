@@ -1,4 +1,3 @@
-// 닉네임 수식어 (82개)
 const nicknameModifiers = [
   '마못찐', '하는', '갤질 중독인', '봌안분인', '위험한', '얀데레', '츤데레', '새드 걸',
   '귀여운', '히키코모리', '헬창', '학대 마려운', '건전한', '불건전한', '지듣노 낚시하는',
@@ -13,7 +12,6 @@ const nicknameModifiers = [
   '실패한', '성공한', '불량재고', '인기 많은', '인기 없는', '괘씸한', '작은', '큰'
 ]
 
-// 방 이름 수식어 (45개)
 const roomModifiers = [
   '듣는', '안듣는', '사랑하는', '싫어하는', '트는', '틀어대는', '작곡하는', '감상하는',
   '연구하는', '씹어먹는', '먹이는', '포교하는', '즐기는', '모르는', '전문가인', '아는',
@@ -23,7 +21,6 @@ const roomModifiers = [
   '비추 박는', '내일 들을', '인생', '안 트는', '잘 트는'
 ]
 
-// 음성 합성 엔진 (60개)
 const vocaloids = [
   '메이코', '카이토', '미쿠', '린', '렌', '루카', '가쿠포', '구미', '릴리', '우나',
   '코토', '츠이나쨩', '유카리', '아카네', '아오이', '아카리유키', '이로하', '즌코', '즌다몬', 'VY1',
@@ -34,7 +31,6 @@ const vocaloids = [
   '후리모멘', '사요', '이타코'
 ]
 
-// 음악 장르 (선별)
 const musicGenres = [
   '와풍', '레트로', '바로크', '일렉트로 스윙', '재즈', '컨템포러리 재즈', '라틴 음악', '인디 음악',
   '일렉트로 포크', '익스페리멘탈 팝', '유로팝', '유로비트', '엔카', '아카펠라', '메탈', '헤비메탈',
@@ -60,7 +56,6 @@ const musicGenres = [
   '사운드 콜라주', '아방가르드'
 ]
 
-// 보카로P 이름 (선별 - 300개+에서 주요 100개)
 const vocaloidProducers = [
   '쿠로우사기', '슈도', '제', '나키소', '마레츠', '유리이 카논', '샤', '테니오하', 'TOQUI', '하뉴 마이고',
   '히후미', '악의P', '유가미P', '쿠로우사P', '죠루진', 'natsuP', '히토시즈쿠P', '야마△', 'kanaria', 'GHOST',
@@ -158,29 +153,20 @@ function getRandomItem<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)]
 }
 
-/**
- * 랜덤 방 이름 생성
- * 패턴: [음악장르|음성합성엔진|보카로P] + [수식어] + "망호"
- */
 export function generateRoomName(): string {
-  // 음악장르, 음성합성엔진, 보카로P 중 랜덤 선택
   const categoryRoll = Math.random()
   let prefix: string
 
   if (categoryRoll < 0.5) {
-    // 50% 확률로 음악 장르
     prefix = getRandomItem(musicGenres)
   } else if (categoryRoll < 0.75) {
-    // 25% 확률로 음성 합성 엔진
     prefix = getRandomItem(vocaloids)
   } else {
-    // 25% 확률로 보카로P
     prefix = getRandomItem(vocaloidProducers)
   }
 
   const modifier = getRandomItem(roomModifiers)
 
-  // 수식어가 빈 문자열이면 "prefix 망호" 형태
   if (modifier === '') {
     return `${prefix} 망호`
   }
@@ -188,10 +174,6 @@ export function generateRoomName(): string {
   return `${prefix} ${modifier} 망호`
 }
 
-/**
- * 랜덤 닉네임 생성
- * 패턴: [수식어] + [음성합성엔진]
- */
 export function generateUsername(): string {
   const modifier = getRandomItem(nicknameModifiers)
   const vocaloid = getRandomItem(vocaloids)

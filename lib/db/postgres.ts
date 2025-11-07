@@ -94,8 +94,6 @@ export async function getChatHistory(roomId: string, limit: number = 50): Promis
 }
 
 export async function initializeDatabase(): Promise<void> {
-  // Supabase에서는 SQL Editor 또는 Dashboard를 통해 스키마 생성
-  // 이 함수는 마이그레이션 참고용으로 남겨둠
   console.log('Database initialization should be done through Supabase Dashboard SQL Editor')
   console.log('Run the following SQL:')
   console.log(`
