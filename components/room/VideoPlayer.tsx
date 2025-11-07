@@ -3,7 +3,7 @@
 import { useRef, useEffect } from 'react'
 import ReactPlayer from 'react-player'
 import { useRoomStore } from '@/lib/stores/room-store'
-import { getSocket } from '@/lib/socket'
+import { emitRealtimeEvent } from '@/lib/realtime-client'
 
 interface VideoPlayerProps {
   roomId: string
@@ -12,23 +12,14 @@ interface VideoPlayerProps {
 export function VideoPlayer({ roomId }: VideoPlayerProps) {
   const playerRef = useRef<any>(null)
   const { currentSong, playerState, updatePlayerState } = useRoomStore()
-  const socket = getSocket()
 
   const song = currentSong()
 
   useEffect(() => {
-    if (!socket) return
-
-    const handleSeek = (data: { position: number }) => {
-      playerRef.current?.seekTo(data.position, 'seconds')
+    if (playerState.position > 0 && playerRef.current) {
+      playerRef.current.seekTo(playerState.position, 'seconds')
     }
-
-    socket.on('player:seek', handleSeek)
-
-    return () => {
-      socket.off('player:seek', handleSeek)
-    }
-  }, [socket])
+  }, [playerState.currentSongIndex])
 
   const handleProgress = ({ playedSeconds }: { playedSeconds: number }) => {
     updatePlayerState({ position: playedSeconds })
@@ -39,17 +30,15 @@ export function VideoPlayer({ roomId }: VideoPlayerProps) {
     const nextIndex = store.playerState.currentSongIndex + 1
 
     if (nextIndex < store.playlist.length) {
-      socket?.emit('player:state', {
-        roomId,
+      emitRealtimeEvent(roomId, 'player:state', {
         state: { currentSongIndex: nextIndex, position: 0, isPlaying: true }
       })
     } else if (playerState.repeat === 'all') {
-      socket?.emit('player:state', {
-        roomId,
+      emitRealtimeEvent(roomId, 'player:state', {
         state: { currentSongIndex: 0, position: 0, isPlaying: true }
       })
     } else {
-      socket?.emit('player:pause', { roomId })
+      emitRealtimeEvent(roomId, 'player:pause')
     }
   }
 

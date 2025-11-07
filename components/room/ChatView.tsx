@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRoomStore } from '@/lib/stores/room-store'
-import { getSocket } from '@/lib/socket'
+import { emitRealtimeEvent } from '@/lib/realtime-client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Send } from 'lucide-react'
@@ -16,14 +16,13 @@ interface ChatViewProps {
 export function ChatView({ roomId }: ChatViewProps) {
   const [message, setMessage] = useState('')
   const { chatMessages, currentUser } = useRoomStore()
-  const socket = getSocket()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages])
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!message.trim() || !currentUser) return
 
     const chatMessage = {
@@ -35,7 +34,13 @@ export function ChatView({ roomId }: ChatViewProps) {
       timestamp: Date.now()
     }
 
-    socket?.emit('chat:message', { roomId, message: chatMessage })
+    await fetch(`/api/rooms/${roomId}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: chatMessage })
+    })
+
+    emitRealtimeEvent(roomId, 'chat:message', { message: chatMessage })
     setMessage('')
   }
 
