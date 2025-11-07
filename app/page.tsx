@@ -14,13 +14,26 @@ export default function Home() {
               </div>
             </div>
 
-            <h1 className="text-6xl md:text-7xl font-bold text-white tracking-tight">
-              지듣노망호
-            </h1>
+            <div className="space-y-2">
+              <h1 className="text-6xl md:text-7xl font-bold text-white tracking-tight">
+                Zidnoman
+              </h1>
+              <p className="text-2xl md:text-3xl text-white/95 font-medium">
+                지듣노, 함께 듣다.
+              </p>
+              <p className="text-xl md:text-2xl text-white/85">
+                지금 바로 망호.
+              </p>
+            </div>
 
-            <p className="text-xl md:text-2xl text-white/90 max-w-xl mx-auto">
-              친구들과 함께 실시간으로 음악을 듣는 공간
-            </p>
+            <div className="space-y-2 pt-4">
+              <p className="text-lg md:text-xl text-white/90">
+                YouTube · 니코동 · SoundCloud 지원
+              </p>
+              <p className="text-sm md:text-base text-white/75">
+                실시간 재생 상황 동기화, 플랫폼 통합 플레이리스트 · 플레이어
+              </p>
+            </div>
           </div>
 
           <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/20 shadow-2xl">
@@ -45,10 +58,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="text-white/60 text-sm space-y-2">
-            <p>YouTube · SoundCloud · Niconico 지원</p>
-            <p className="text-xs">실시간 동기화 · 채팅 · 플레이리스트 공유</p>
-          </div>
         </div>
       </div>
     </div>
