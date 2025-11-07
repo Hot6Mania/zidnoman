@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Infinity symbol with glow - hollow with yellow outline, transparent background -->
+  <g filter="url(#glow)">
+    <ellipse cx="165" cy="256" rx="85" ry="105" fill="none" stroke="#FFFFA5" stroke-width="28"/>
+    <ellipse cx="347" cy="256" rx="85" ry="105" fill="none" stroke="#FFFFA5" stroke-width="28"/>
+  </g>
+</svg>

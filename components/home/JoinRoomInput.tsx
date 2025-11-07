@@ -61,13 +61,13 @@ export function JoinRoomInput() {
 
   return (
     <>
-      <div className="flex gap-2 w-full max-w-md">
+      <div className="flex items-center gap-2 w-full max-w-md mx-auto">
         <Input
           placeholder="방 코드 입력 (예: aBcD1234)"
           value={roomCode}
           onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
           maxLength={8}
-          className="text-center text-lg tracking-wider"
+          className="text-center text-sm sm:text-base md:text-lg tracking-wider placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base"
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleCheckRoom()
           }}
@@ -76,6 +76,7 @@ export function JoinRoomInput() {
           onClick={handleCheckRoom}
           disabled={!roomCode.trim() || loading}
           size="lg"
+          className="shrink-0"
         >
           <LogIn className="h-5 w-5" />
         </Button>
