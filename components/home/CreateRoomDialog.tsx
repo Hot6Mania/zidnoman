@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Plus, RefreshCw } from 'lucide-react'
+import { toast } from 'sonner'
 import { generateRoomName, generateUsername } from '@/lib/random-names'
 
 export function CreateRoomDialog() {
@@ -57,10 +58,11 @@ export function CreateRoomDialog() {
 
       localStorage.setItem(`user-${roomId}`, JSON.stringify(user))
 
+      toast.success('방이 생성되었습니다')
       router.push(`/room/${roomId}`)
     } catch (error) {
       console.error('Error creating room:', error)
-      alert('Failed to create room. Please try again.')
+      toast.error('방 생성에 실패했습니다. 다시 시도해주세요.')
     } finally {
       setLoading(false)
     }

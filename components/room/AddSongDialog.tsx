@@ -14,10 +14,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus, Loader2 } from 'lucide-react'
-import { getSocket } from '@/lib/socket'
+import { toast } from 'sonner'
+import { emitRealtimeEvent } from '@/lib/realtime-client'
 import { useRoomStore } from '@/lib/stores/room-store'
 import { parseYouTubeUrl } from '@/lib/utils'
 import { getYouTubeVideoInfo } from '@/lib/youtube'
+import { getSoundCloudTrackInfo } from '@/lib/soundcloud'
+import { getNiconicoVideoInfo } from '@/lib/niconico'
 import { nanoid } from 'nanoid'
 import { Song } from '@/lib/types'
 
@@ -30,7 +33,6 @@ export function AddSongDialog({ roomId }: AddSongDialogProps) {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const { currentUser } = useRoomStore()
-  const socket = getSocket()
 
   const detectPlatform = (url: string): { platform: string; id: string | null } => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
@@ -59,7 +61,7 @@ export function AddSongDialog({ roomId }: AddSongDialogProps) {
       const { platform, id } = detectPlatform(url)
 
       if (!id) {
-        alert('지원하지 않는 URL 형식입니다')
+        toast.error('지원하지 않는 URL 형식입니다')
         return
       }
 
@@ -76,24 +78,32 @@ export function AddSongDialog({ roomId }: AddSongDialogProps) {
         const info = await getYouTubeVideoInfo(id)
         songData = { ...songData, ...info }
       } else if (platform === 'soundcloud') {
-        songData.title = 'SoundCloud Track'
-        songData.artist = 'Unknown Artist'
-        songData.thumbnailUrl = '/placeholder-music.png'
-        songData.duration = 180
+        const info = await getSoundCloudTrackInfo(url)
+        songData = { ...songData, ...info }
       } else if (platform === 'niconico') {
-        songData.title = `Niconico Video ${id}`
-        songData.artist = 'Unknown Artist'
-        songData.thumbnailUrl = '/placeholder-music.png'
-        songData.duration = 180
+        const info = await getNiconicoVideoInfo(id)
+        songData = { ...songData, ...info }
       }
 
-      socket?.emit('song:add', { roomId, song: songData as Song })
+      const response = await fetch(`/api/rooms/${roomId}/songs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ song: songData as Song })
+      })
 
+      if (!response.ok) throw new Error('Failed to add song')
+
+      const { playlist } = await response.json()
+
+      emitRealtimeEvent(roomId, 'song:add', { song: songData as Song })
+      emitRealtimeEvent(roomId, 'playlist:update', { playlist })
+
+      toast.success('곡이 플레이리스트에 추가되었습니다')
       setUrl('')
       setOpen(false)
     } catch (error) {
       console.error('Error adding song:', error)
-      alert('곡을 추가하는 중 오류가 발생했습니다')
+      toast.error('곡을 추가하는 중 오류가 발생했습니다')
     } finally {
       setLoading(false)
     }

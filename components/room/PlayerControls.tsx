@@ -4,7 +4,7 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle } from 'lu
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { useRoomStore } from '@/lib/stores/room-store'
-import { getSocket } from '@/lib/socket'
+import { emitRealtimeEvent } from '@/lib/realtime-client'
 import { formatDuration } from '@/lib/utils'
 
 interface PlayerControlsProps {
@@ -13,15 +13,14 @@ interface PlayerControlsProps {
 
 export function PlayerControls({ roomId }: PlayerControlsProps) {
   const { currentSong, playerState, updatePlayerState } = useRoomStore()
-  const socket = getSocket()
 
   const song = currentSong()
 
   const handlePlayPause = () => {
     if (playerState.isPlaying) {
-      socket?.emit('player:pause', { roomId })
+      emitRealtimeEvent(roomId, 'player:pause')
     } else {
-      socket?.emit('player:play', { roomId })
+      emitRealtimeEvent(roomId, 'player:play')
     }
   }
 
@@ -29,8 +28,7 @@ export function PlayerControls({ roomId }: PlayerControlsProps) {
     const store = useRoomStore.getState()
     const nextIndex = Math.min(store.playerState.currentSongIndex + 1, store.playlist.length - 1)
 
-    socket?.emit('player:state', {
-      roomId,
+    emitRealtimeEvent(roomId, 'player:state', {
       state: { currentSongIndex: nextIndex, position: 0 }
     })
   }
@@ -39,15 +37,14 @@ export function PlayerControls({ roomId }: PlayerControlsProps) {
     const store = useRoomStore.getState()
     const prevIndex = Math.max(store.playerState.currentSongIndex - 1, 0)
 
-    socket?.emit('player:state', {
-      roomId,
+    emitRealtimeEvent(roomId, 'player:state', {
       state: { currentSongIndex: prevIndex, position: 0 }
     })
   }
 
   const handleSeek = (value: number[]) => {
     const position = value[0]
-    socket?.emit('player:seek', { roomId, position })
+    emitRealtimeEvent(roomId, 'player:seek', { position })
     updatePlayerState({ position })
   }
 
@@ -56,8 +53,7 @@ export function PlayerControls({ roomId }: PlayerControlsProps) {
   }
 
   const handleShuffle = () => {
-    socket?.emit('player:state', {
-      roomId,
+    emitRealtimeEvent(roomId, 'player:state', {
       state: { shuffle: !playerState.shuffle }
     })
   }
@@ -67,8 +63,7 @@ export function PlayerControls({ roomId }: PlayerControlsProps) {
       playerState.repeat === 'none' ? 'all' :
       playerState.repeat === 'all' ? 'one' : 'none'
 
-    socket?.emit('player:state', {
-      roomId,
+    emitRealtimeEvent(roomId, 'player:state', {
       state: { repeat: nextRepeat }
     })
   }

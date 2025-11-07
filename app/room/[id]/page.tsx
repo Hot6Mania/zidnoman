@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { RoomHeader } from '@/components/room/RoomHeader'
 import { VideoPlayer } from '@/components/room/VideoPlayer'
 import { PlayerControls } from '@/components/room/PlayerControls'
@@ -9,7 +10,7 @@ import { PlaylistView } from '@/components/room/PlaylistView'
 import { ChatView } from '@/components/room/ChatView'
 import { AddSongDialog } from '@/components/room/AddSongDialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useSocket } from '@/lib/hooks/useSocket'
+import { useRealtime } from '@/lib/hooks/useRealtime'
 import { useRoomStore } from '@/lib/stores/room-store'
 import { User } from '@/lib/types'
 import { generateUserColor } from '@/lib/utils'
@@ -64,7 +65,7 @@ export default function RoomPage({ params }: { params: Promise<{ id: string }> }
     initUser()
   }, [roomId, router, setStoreUser])
 
-  useSocket(roomId, currentUser)
+  useRealtime(roomId, currentUser)
 
   if (loading) {
     return (
@@ -75,47 +76,49 @@ export default function RoomPage({ params }: { params: Promise<{ id: string }> }
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <RoomHeader roomId={roomId} />
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background">
+        <RoomHeader roomId={roomId} />
 
-      <div className="container mx-auto p-4 space-y-4">
-        <div className="max-w-4xl mx-auto">
-          <VideoPlayer roomId={roomId} />
-        </div>
+        <div className="container mx-auto p-4 space-y-4">
+          <div className="max-w-4xl mx-auto">
+            <VideoPlayer roomId={roomId} />
+          </div>
 
-        <div className="max-w-4xl mx-auto">
-          <PlayerControls roomId={roomId} />
-        </div>
+          <div className="max-w-4xl mx-auto">
+            <PlayerControls roomId={roomId} />
+          </div>
 
-        <div className="max-w-4xl mx-auto">
-          <Tabs defaultValue="playlist" className="w-full">
-            <div className="flex items-center justify-between mb-4">
-              <TabsList>
-                <TabsTrigger value="playlist" className="gap-2">
-                  <List className="h-4 w-4" />
-                  플레이리스트
-                </TabsTrigger>
-                <TabsTrigger value="chat" className="gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  채팅
-                </TabsTrigger>
-              </TabsList>
+          <div className="max-w-4xl mx-auto">
+            <Tabs defaultValue="playlist" className="w-full">
+              <div className="flex items-center justify-between mb-4">
+                <TabsList>
+                  <TabsTrigger value="playlist" className="gap-2">
+                    <List className="h-4 w-4" />
+                    플레이리스트
+                  </TabsTrigger>
+                  <TabsTrigger value="chat" className="gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    채팅
+                  </TabsTrigger>
+                </TabsList>
 
-              <AddSongDialog roomId={roomId} />
-            </div>
-
-            <TabsContent value="playlist" className="space-y-4 mt-0">
-              <PlaylistView roomId={roomId} />
-            </TabsContent>
-
-            <TabsContent value="chat" className="mt-0">
-              <div className="bg-card rounded-lg border h-[500px]">
-                <ChatView roomId={roomId} />
+                <AddSongDialog roomId={roomId} />
               </div>
-            </TabsContent>
-          </Tabs>
+
+              <TabsContent value="playlist" className="space-y-4 mt-0">
+                <PlaylistView roomId={roomId} />
+              </TabsContent>
+
+              <TabsContent value="chat" className="mt-0">
+                <div className="bg-card rounded-lg border h-[500px]">
+                  <ChatView roomId={roomId} />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   )
 }

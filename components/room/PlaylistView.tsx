@@ -4,7 +4,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useRoomStore } from '@/lib/stores/room-store'
-import { getSocket } from '@/lib/socket'
+import { emitRealtimeEvent } from '@/lib/realtime-client'
 import { Song } from '@/lib/types'
 import { formatDuration } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -88,7 +88,6 @@ interface PlaylistViewProps {
 
 export function PlaylistView({ roomId }: PlaylistViewProps) {
   const { playlist, playerState } = useRoomStore()
-  const socket = getSocket()
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -97,7 +96,7 @@ export function PlaylistView({ roomId }: PlaylistViewProps) {
     })
   )
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
 
     if (!over || active.id === over.id) return
@@ -105,20 +104,34 @@ export function PlaylistView({ roomId }: PlaylistViewProps) {
     const oldIndex = playlist.findIndex(s => s.id === active.id)
     const newIndex = playlist.findIndex(s => s.id === over.id)
 
-    socket?.emit('song:reorder', {
-      roomId,
+    const response = await fetch(`/api/rooms/${roomId}/songs`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fromIndex: oldIndex, toIndex: newIndex })
+    })
+
+    const { playlist: updatedPlaylist } = await response.json()
+
+    emitRealtimeEvent(roomId, 'song:reorder', {
       fromIndex: oldIndex,
       toIndex: newIndex
     })
+    emitRealtimeEvent(roomId, 'playlist:update', { playlist: updatedPlaylist })
   }
 
-  const handleRemove = (songId: string) => {
-    socket?.emit('song:remove', { roomId, songId })
+  const handleRemove = async (songId: string) => {
+    const response = await fetch(`/api/rooms/${roomId}/songs?songId=${songId}`, {
+      method: 'DELETE'
+    })
+
+    const { playlist: updatedPlaylist } = await response.json()
+
+    emitRealtimeEvent(roomId, 'song:remove', { songId })
+    emitRealtimeEvent(roomId, 'playlist:update', { playlist: updatedPlaylist })
   }
 
   const handlePlay = (index: number) => {
-    socket?.emit('player:state', {
-      roomId,
+    emitRealtimeEvent(roomId, 'player:state', {
       state: { currentSongIndex: index, position: 0, isPlaying: true }
     })
   }
