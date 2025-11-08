@@ -4,69 +4,65 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { LogIn } from 'lucide-react'
+import { toast } from 'sonner'
 
 export function JoinRoomInput() {
   const [roomCode, setRoomCode] = useState('')
-  const [username, setUsername] = useState('')
-  const [showDialog, setShowDialog] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+
+  const extractRoomId = (input: string): string => {
+    // URL 형식인 경우 roomId 추출
+    try {
+      const url = new URL(input)
+      const pathParts = url.pathname.split('/')
+      const roomIndex = pathParts.indexOf('room')
+      if (roomIndex !== -1 && pathParts[roomIndex + 1]) {
+        return pathParts[roomIndex + 1]
+      }
+    } catch {
+      // URL이 아니면 그대로 roomId로 사용
+    }
+    return input.trim()
+  }
 
   const handleCheckRoom = async () => {
     if (!roomCode.trim()) return
 
     setLoading(true)
+    const loadingToast = toast.loading('방 확인 중...')
 
     try {
-      const response = await fetch(`/api/rooms/${roomCode}`)
+      const actualRoomId = extractRoomId(roomCode)
+      const response = await fetch(`/api/rooms/${actualRoomId}`)
 
       if (!response.ok) {
-        alert('존재하지 않는 방입니다.')
+        toast.error('존재하지 않는 방입니다.', { id: loadingToast })
+        setLoading(false)
         return
       }
 
-      setShowDialog(true)
+      toast.success('방 입장 중...', {
+        id: loadingToast,
+        duration: 3000
+      })
+      setRoomCode(actualRoomId)
+      router.push(`/room/${actualRoomId}`)
     } catch (error) {
       console.error('Error checking room:', error)
-      alert('방을 확인할 수 없습니다.')
-    } finally {
+      toast.error('방을 확인할 수 없습니다.', { id: loadingToast })
       setLoading(false)
     }
-  }
-
-  const handleJoin = () => {
-    if (!username.trim()) return
-
-    const user = {
-      id: Math.random().toString(36).substring(7),
-      username,
-      color: '#' + Math.floor(Math.random()*16777215).toString(16),
-      role: 'member' as const,
-      joinedAt: Date.now()
-    }
-
-    localStorage.setItem(`user-${roomCode}`, JSON.stringify(user))
-    router.push(`/room/${roomCode}`)
   }
 
   return (
     <>
       <div className="flex items-center gap-2 w-full max-w-md mx-auto">
         <Input
-          placeholder="방 코드 입력 (예: aBcD1234)"
+          placeholder="방 링크 또는 코드 입력"
           value={roomCode}
-          onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-          maxLength={8}
+          onChange={(e) => setRoomCode(e.target.value.trim())}
           className="text-center text-sm sm:text-base md:text-lg tracking-wider placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base"
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleCheckRoom()
@@ -82,39 +78,6 @@ export function JoinRoomInput() {
         </Button>
       </div>
 
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>방 입장</DialogTitle>
-            <DialogDescription>
-              닉네임을 입력하고 방에 입장하세요
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="join-username">닉네임</Label>
-              <Input
-                id="join-username"
-                placeholder="김뮤직"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                maxLength={20}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleJoin()
-                }}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              onClick={handleJoin}
-              disabled={!username.trim()}
-            >
-              입장하기
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   )
 }

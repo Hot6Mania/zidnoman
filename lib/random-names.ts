@@ -5,11 +5,11 @@ const nicknameModifiers = [
   '목조르는', '이상한', '실패작인', '윤회하는', '아재개그하는', '요염한', '거유', '빈유',
   '음란한', '엣찌한', '천박한', '조용한', '시끄러운', '개초딩', '상냥한', '진지한',
   '따뜻한', '냉각이 필요한', '로봇', '무시무시한', '사랑스러운', '사랑하는', '착한', '나쁜',
-  '노래하는', '노래안하는', '일본인', '한국인', '중국인', '미국인', '징집된', '순한',
-  '완벽한', '내한하는', '껌젖', '행복한', '불행한', '철학적인', '시큼한', '때리는',
+  '노래하는', '노래 안하는', '일본인', '한국인', '중국인', '미국인', '징집된', '순한',
+  '완벽한', '한국에 온', '일본을 떠난', '화성에 간', '껌젖', '행복한', '불행한', '철학적인', '시큼한', '때리는',
   '음탕한', '훌륭한', '거대한', '약한', '강한', '풍성한', '탈모', '개추한',
   '비추한', '흥분한', '신기한', '현명한', '나른한', '저렴한', '비싼', '할인 중인',
-  '실패한', '성공한', '불량재고', '인기 많은', '인기 없는', '괘씸한', '작은', '큰'
+  '실패한', '성공한', '불량재고', '인기 많은', '인기 없는', '괘씸한', '작은', '큰', '갤창', '으흐흐'
 ]
 
 const roomModifiers = [
@@ -23,7 +23,7 @@ const roomModifiers = [
 
 const vocaloids = [
   '메이코', '카이토', '미쿠', '린', '렌', '루카', '가쿠포', '구미', '릴리', '우나',
-  '코토', '츠이나쨩', '유카리', '아카네', '아오이', '아카리유키', '이로하', '즌코', '즌다몬', 'VY1',
+  '코토', '츠이나쨩', '유카리', '아카네', '아오이', '아카리', '유키', '이로하', '즌코', '즌다몬', 'VY1',
   'VY2', '게키야쿠', '카제히키', '카나데', '츠무기', '너스로봇', '마론', '시유', '유니', '마이카',
   '뤄톈이', 'IA', '옌허', '웨정링', '웨정룽야', '즈위모커', '모칭셴', '플라워', '히메', '미코토',
   '키리탄', '카후', '세카이', '리메', '코코', '하루', '리무루', '릿카', '마키', '모카',
@@ -91,7 +91,7 @@ const vocaloidProducers = [
   '사토 노코', '스야마', '전기고래', 'NMKK', '나메키카', '와카메아이스', '니호시카', '후로쿠로', 'frog96', '유쿠에왓토',
   '우이', 'sasakure.UK', '사사쿠레', '사타나', 'citrus', '텐키', '돗P', 'negoto', 'Odd', 'task',
   'supertaskmusic', '나나호시 관현악단', '이와미 타카시', 'you맨', '아이이로 니시몬', '오리이베 코피', 'kemu', '케무', '호리에 쇼타',
-  '나카무라 이네', '코스게 곤약', '사이토 유우키', 'cosMo', '폭주P', '진', '자연의적P', 'yusukeP', '유유P', 'ゆうゆP',
+  '나카무라 이네', '코스게 곤약', '사이토 유우키', 'cosMo', '폭주P', '진', '자연의적P', 'yusukeP', '유유P', 
   'ryo', 'supercell', 'Fty', 'coha', 'IRON신노스케Jr', '시안 키노', 'Cyan Kino', 'Sceno Ichiro', '세노 이치로',
   'SeikoP', 'PeriTune', '무츠키 세이', '유작P', 'kairu', '사토이모', '천보석P', '세나 와타루', 'todoP', '유키노 이토',
   '반탄스', 'LUNA', '레거시', '롱게스트', 'Omoi', '오와타P', '카를로스 하카마다', '사이제P', '키노시타', '데드볼P',
@@ -101,8 +101,8 @@ const vocaloidProducers = [
   'SOMIACHAN', '모루P', 'MOL', '이마사라P', 'yama-dai', '에나구루후', '우키요P', 'wtnb', '공중 루사', 'quoree',
   '쿠오리', '페더 밈', 'Elitetao', 'piptotao', 'kusegumi', 'hinoneh', 'pei', '유우키쨩', '긴급 유로포트',
   '쿠로에Daphnis', '콘페이토P', '별사탕P', 'competor', 'sansui', '야마다 미즈호', '비엔', '후노니카', '미미미에나', '메만지',
-  'daniwellP', '마시마 유로', '야스미 스야', '유코피', '라마즈P', 'LamazeP', '고지마지P', 'ゴジマジP', '에샤', '오이쨩',
-  '오구라 마가린', '쿠누스P', 'SH100000', '자동필기', '다나카 카즈오', '펠리컨 동기', '미나미 사키', '알쿠레무', 'r-906',
+  'daniwellP', '마시마 유로', '야스미 스야', '유코피', '라마즈P', 'LamazeP', '고지마지P',  '에샤', '오이쨩',
+  '쿠누스P', 'SH100000', '자동필기', '다나카 카즈오', '펠리컨 동기', '미나미 사키', '알쿠레무', 'r-906',
   '아오리스', 'Alpaca', 'Tsukasa Ichimura', 'emon', 'Tes', 'kz', 'livetune', '사노 카모메', '스즈메노메',
   'temporu', '나카노는 4번', 'nakano4', 'Namitape', 'wateraqua', '아에루', '아루쿠히토', 'ukaihi', '오시바 광맥',
   'gaburyu', '쿠잇쿠', 'qqぃqq', '색즉시몽', '하코', '하코모리', 'higma', '미야자와 모요요', 'KAIRUI', 'CleanTears',
@@ -143,7 +143,7 @@ const vocaloidProducers = [
   '전자동 무대륙', 'daluy', '타노토리', '니시마와시', 'FuzzP', 'ManHoleMan', 'YARUSE NAKIO', 'amahisa', 'ukiyojingu',
   '오카상', '코무기 쟈무', '밀 잼', '하나레기 카나', '하니와', '아메리카 민요 연구회', 'E히사쿤', '아오야 나츠키',
   '이하쿠시', '원반P', '스즈나리', 'Torero', '야나가 미유키', 'yanagamiyuki', 'MSS 사운드 시스템', '신카 미야비', '스즈키 오우',
-  '하이요리 코', '야코 우메', '야행 매화', '야마모토 뉴', '안도 나레도', 'Undo \'n\' Redo', 'yeahyoutoo', 'snsn',
+  '하이요리 코', '야코 우메', '야행 매화', '야마모토 뉴', '안도 나레도', 'Undo Redo', 'yeahyoutoo', 'snsn',
   '오키나', '중2병P', 'baboo', 'period', '츠치야마 시구레', '미즈노에 미조레', '미츠바치P', '꿀벌P', '아메카',
   '우타카타P', '물거품P', 'ORII', 'F도어', 'Fdur', '다이죠부P', '괜찮아P', '타노시이마구로댄스P', '즐거운 참치 댄스P', '힐링P',
   'MC_PEACETIME', '힛키P', '오오타카 토모오키', 'poporun', 'po9o2un'
@@ -153,26 +153,25 @@ function getRandomItem<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)]
 }
 
-export function generateRoomName(): string {
-  const categoryRoll = Math.random()
-  let prefix: string
+function getRandomRoomPrefix(): string {
+  const totalLength = musicGenres.length + vocaloids.length + vocaloidProducers.length
+  const index = Math.floor(Math.random() * totalLength)
 
-  if (categoryRoll < 0.5) {
-    prefix = getRandomItem(musicGenres)
-  } else if (categoryRoll < 0.75) {
-    prefix = getRandomItem(vocaloids)
+  if (index < musicGenres.length) {
+    return musicGenres[index]
+  } else if (index < musicGenres.length + vocaloids.length) {
+    return vocaloids[index - musicGenres.length]
   } else {
-    prefix = getRandomItem(vocaloidProducers)
+    return vocaloidProducers[index - musicGenres.length - vocaloids.length]
   }
-
-  const modifier = getRandomItem(roomModifiers)
-
-  if (modifier === '') {
-    return `${prefix} 망호`
-  }
-
-  return `${prefix} ${modifier} 망호`
 }
+
+export function generateRoomName(): string {
+  const prefix = getRandomRoomPrefix()
+  const modifier = getRandomItem(roomModifiers)
+  return modifier === '' ? `${prefix} 망호` : `${prefix} ${modifier} 망호`
+}
+
 
 export function generateUsername(): string {
   const modifier = getRandomItem(nicknameModifiers)
