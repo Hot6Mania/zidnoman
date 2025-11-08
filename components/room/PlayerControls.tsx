@@ -84,10 +84,11 @@ export function PlayerControls({ roomId, channel }: PlayerControlsProps) {
   }, [song?.id, currentUser?.id, roomId, voteSkipEnabled, setVoteSkipState])
 
   const handlePlayPause = async () => {
-    const newState = { isPlaying: !playerState.isPlaying }
+    const isPlaying = !playerState.isPlaying
+    const newState = { isPlaying, position: playerState.position }
 
     // Optimistic update: Apply immediately to local state
-    updatePlayerState(newState)
+    updatePlayerState({ isPlaying })
 
     // Then update server and broadcast (async, don't wait)
     fetch(`/api/rooms/${roomId}/player-state`, {
@@ -97,14 +98,14 @@ export function PlayerControls({ roomId, channel }: PlayerControlsProps) {
     }).catch(error => {
       console.error('Failed to update play/pause state:', error)
       // Revert on error
-      updatePlayerState({ isPlaying: !newState.isPlaying })
+      updatePlayerState({ isPlaying: !isPlaying })
     })
 
-    // Broadcast to other users
+    // Broadcast to other users with current position
     if (playerState.isPlaying) {
-      emitRealtimeEvent(channel, 'player:pause')
+      emitRealtimeEvent(channel, 'player:pause', { position: playerState.position })
     } else {
-      emitRealtimeEvent(channel, 'player:play')
+      emitRealtimeEvent(channel, 'player:play', { position: playerState.position })
     }
   }
 
