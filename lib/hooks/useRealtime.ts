@@ -19,6 +19,7 @@ export function useRealtime(roomId: string | null, user: User | null): RealtimeC
   const reconnectAttemptRef = useRef<number>(0)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const connectionToastRef = useRef<string | number | null>(null)
+  const isUnmountingRef = useRef<boolean>(false)
   const {
     setRoom,
     setPlaylist,
@@ -154,6 +155,12 @@ export function useRealtime(roomId: string | null, user: User | null): RealtimeC
             heartbeatIntervalRef.current = null
           }
 
+          // Don't reconnect if component is unmounting (user leaving room)
+          if (isUnmountingRef.current) {
+            console.log('🚪 Component unmounting, skipping reconnection')
+            return
+          }
+
           if (reconnectAttemptRef.current < 10) {
             const delay = Math.min(1000 * Math.pow(1.5, reconnectAttemptRef.current), 5000)
             console.log(`🔄 Attempting to reconnect in ${delay}ms... (${reconnectAttemptRef.current + 1}/10)`)
@@ -166,6 +173,12 @@ export function useRealtime(roomId: string | null, user: User | null): RealtimeC
             }
 
             reconnectTimeoutRef.current = setTimeout(async () => {
+              // Double-check if still mounted
+              if (isUnmountingRef.current) {
+                console.log('🚪 Component unmounted during timeout, aborting reconnection')
+                return
+              }
+
               reconnectAttemptRef.current += 1
               console.log(`🔄 Reconnection attempt ${reconnectAttemptRef.current}/10`)
 
@@ -175,7 +188,9 @@ export function useRealtime(roomId: string | null, user: User | null): RealtimeC
 
                 // Wait a bit before resubscribing
                 setTimeout(() => {
-                  channel.subscribe()
+                  if (!isUnmountingRef.current) {
+                    channel.subscribe()
+                  }
                 }, 500)
               } catch (error) {
                 console.error('Error during reconnection:', error)
@@ -387,6 +402,10 @@ export function useRealtime(roomId: string | null, user: User | null): RealtimeC
       })
 
     return () => {
+      // Mark as unmounting to prevent reconnection attempts
+      isUnmountingRef.current = true
+
+      // Clear all timers
       if (heartbeatIntervalRef.current) {
         clearInterval(heartbeatIntervalRef.current)
         heartbeatIntervalRef.current = null
@@ -397,10 +416,14 @@ export function useRealtime(roomId: string | null, user: User | null): RealtimeC
         reconnectTimeoutRef.current = null
       }
 
+      // Dismiss connection toast if exists
       if (connectionToastRef.current) {
         toast.dismiss(connectionToastRef.current)
         connectionToastRef.current = null
       }
+
+      // Reset reconnect attempt counter
+      reconnectAttemptRef.current = 0
 
       if (channel) {
         channel.send({
