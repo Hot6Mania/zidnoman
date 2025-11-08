@@ -214,15 +214,21 @@ export function useRealtime(roomId: string | null, user: User | null): RealtimeC
     setupChannel()
 
     channel
-      .on('broadcast', { event: 'player:play' }, () => {
-        console.log('🎵 Received player:play event')
-        updatePlayerState({ isPlaying: true })
-        // Server state already updated by sender
+      .on('broadcast', { event: 'player:play' }, async ({ payload }) => {
+        console.log('🎵 Received player:play event', payload)
+        const newState = { isPlaying: true }
+        if (payload?.position !== undefined) {
+          Object.assign(newState, { position: payload.position })
+        }
+        updatePlayerState(newState)
       })
-      .on('broadcast', { event: 'player:pause' }, () => {
-        console.log('⏸️  Received player:pause event')
-        updatePlayerState({ isPlaying: false })
-        // Server state already updated by sender
+      .on('broadcast', { event: 'player:pause' }, async ({ payload }) => {
+        console.log('⏸️  Received player:pause event', payload)
+        const newState = { isPlaying: false }
+        if (payload?.position !== undefined) {
+          Object.assign(newState, { position: payload.position })
+        }
+        updatePlayerState(newState)
       })
       .on('broadcast', { event: 'player:seek' }, ({ payload }) => {
         updatePlayerState({ position: payload.position })

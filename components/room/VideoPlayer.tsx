@@ -228,7 +228,9 @@ export function VideoPlayer({ roomId, channel }: VideoPlayerProps) {
         body: JSON.stringify({ state: newState })
       })
 
-      emitRealtimeEvent(channel, state === 'playing' ? 'player:play' : 'player:pause')
+      emitRealtimeEvent(channel, state === 'playing' ? 'player:play' : 'player:pause', {
+        position: currentPosition
+      })
     } else {
       // Non-master: debounced state restoration to prevent infinite loops
       const serverIsPlaying = playerState.isPlaying
@@ -246,7 +248,8 @@ export function VideoPlayer({ roomId, channel }: VideoPlayerProps) {
       if (serverIsPlaying !== iframeSaysPlaying) {
         console.log('🔄 Non-master state mismatch, restoring server state:', {
           iframe: state,
-          server: serverIsPlaying ? 'playing' : 'paused'
+          server: serverIsPlaying ? 'playing' : 'paused',
+          serverPosition: playerState.position
         })
 
         // Clear any pending restore
@@ -257,6 +260,18 @@ export function VideoPlayer({ roomId, channel }: VideoPlayerProps) {
         // Debounce state restoration
         stateRestoreTimeoutRef.current = setTimeout(() => {
           if (youtubePlayerRef.current) {
+            // First, sync position to match server state
+            const currentPos = youtubePlayerRef.current.getCurrentTime?.() || 0
+            const serverPos = playerState.position
+            const drift = Math.abs(currentPos - serverPos)
+
+            // Sync position if drift is significant
+            if (drift > 1.0) {
+              console.log(`🔄 Syncing position: local=${currentPos.toFixed(1)}s, server=${serverPos.toFixed(1)}s`)
+              youtubePlayerRef.current.seekTo(serverPos)
+            }
+
+            // Then apply play/pause state
             if (serverIsPlaying) {
               youtubePlayerRef.current.playVideo()
             } else {
@@ -312,6 +327,29 @@ export function VideoPlayer({ roomId, channel }: VideoPlayerProps) {
 
   useEffect(() => {
     if (!channel || isUserSyncMaster) return
+
+    const handlePlayPause = ({ payload }: any) => {
+      console.log('🎵/⏸️  Play/Pause event received:', payload)
+
+      if (payload?.position !== undefined) {
+        previousPositionRef.current = payload.position
+
+        if (isYouTube && youtubePlayerRef.current) {
+          const currentPos = youtubePlayerRef.current.getCurrentTime?.() || 0
+          const drift = Math.abs(currentPos - payload.position)
+
+          // Sync position if drift is significant
+          if (drift > 1.0) {
+            console.log(`🔄 Syncing position on play/pause: local=${currentPos.toFixed(1)}s, server=${payload.position.toFixed(1)}s`)
+            youtubePlayerRef.current.seekTo(payload.position)
+          }
+        } else if (isNiconico && niconicoPlayerRef.current) {
+          niconicoPlayerRef.current.seekTo(payload.position)
+        } else if (playerRef.current) {
+          playerRef.current.seekTo(payload.position, 'seconds')
+        }
+      }
+    }
 
     const handleSeek = ({ payload }: any) => {
       console.log('📍 Seek event received:', payload.position)
@@ -398,9 +436,11 @@ export function VideoPlayer({ roomId, channel }: VideoPlayerProps) {
     }
 
     channel
+      .on('broadcast', { event: 'player:play' }, handlePlayPause)
+      .on('broadcast', { event: 'player:pause' }, handlePlayPause)
       .on('broadcast', { event: 'player:seek' }, handleSeek)
       .on('broadcast', { event: 'sync:heartbeat' }, handleHeartbeat)
-  }, [channel, isNiconico, isYouTube, isUserSyncMaster])
+  }, [channel, isNiconico, isYouTube, isUserSyncMaster, playerState.isPlaying])
 
   // DJ features disabled to prevent duplicate playback
   // useEffect(() => {
