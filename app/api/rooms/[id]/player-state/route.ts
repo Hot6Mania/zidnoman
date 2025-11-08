@@ -15,10 +15,16 @@ export async function POST(
     isPlaying: false,
     volume: 50,
     shuffle: false,
-    repeat: 'none'
+    repeat: 'none',
+    playbackRate: 1.0,
+    mode: 'list'
   }
 
-  const newState = { ...currentState, ...state }
+  const newState = {
+    ...currentState,
+    ...state,
+    lastUpdateTime: Date.now()
+  }
   await setRoomPlayerState(roomId, newState)
 
   return NextResponse.json({ state: newState })

@@ -18,7 +18,7 @@ export async function getNiconicoVideoInfo(videoId: string): Promise<NiconicoVid
     return {
       title: `Niconico Video ${videoId}`,
       artist: 'Unknown Artist',
-      thumbnailUrl: '/placeholder-music.png',
+      thumbnailUrl: '/placeholder-music.svg',
       duration: 180
     }
   }

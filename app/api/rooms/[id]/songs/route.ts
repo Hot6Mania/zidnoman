@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getRoomPlaylist, setRoomPlaylist } from '@/lib/db/redis'
+import { getRoomData, getRoomPlaylist, setRoomPlaylist } from '@/lib/db/redis'
 import { Song } from '@/lib/types'
 
 export async function POST(
@@ -8,6 +8,18 @@ export async function POST(
 ) {
   const { id: roomId } = await params
   const { song }: { song: Song } = await req.json()
+
+  const room = await getRoomData(roomId)
+  if (!room) {
+    return NextResponse.json({ error: 'Room not found' }, { status: 404 })
+  }
+
+  if (room.settings.allowAddSongs === 'moderators') {
+    return NextResponse.json(
+      { error: 'Only moderators can add songs' },
+      { status: 403 }
+    )
+  }
 
   const playlist = await getRoomPlaylist(roomId)
   playlist.push(song)

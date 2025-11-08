@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       createdAt: Date.now(),
       ownerId: userId,
       settings: {
-        allowAddSongs: 'all',
+        allowAddSongs: 'normal',
         enableChat: true,
         enableVoteSkip: true,
         voteSkipThreshold: 0.5
